@@ -1,20 +1,27 @@
 # criador por kiko do ti / ifrs feliz
-vida_jogador = 100
-vida_monstro = 0
-monstro_tag = ""
+jogador = {
+    "vida": 100,
+    "inventario": {"escudo": 0, "arco": 0, "poção": 0} 
+}
+monstro = {
+    "vida": 0,
+    "nome": ""
+}
 desejo = 0
 loteria = 0
-armadura = 0
 dano = 0
 erro = "=====ERRO.INPUT===="
-import random
-import os
+import random, os, time
 
+def cleam():
+    time.sleep(1.2)
+    os.system("cls" if os.name == "nt" else "clear")
 
 def explorar_floresta(): #seleção de deseja entrar na floresta 
+    global desejo
     while True:
-        global desejo
-        while desejo !=2 or desejo !=1:
+        desejo = 0
+        while desejo not in (1, 2) :
             desejo = int(input("""
         |=======================================|
         | oque deseja fazer ?                   |
@@ -22,6 +29,7 @@ def explorar_floresta(): #seleção de deseja entrar na floresta
         | 2 - continuar explorando a floresta   |
         |=======================================|
          >>>"""))
+
             if desejo == 1:
                 print("""
         |=======================================|
@@ -29,29 +37,36 @@ def explorar_floresta(): #seleção de deseja entrar na floresta
         | volta e não encontrou nenhum inimigo  |
         |=======================================|""")
                 explorar_masmorra()
+                
                 break
             elif desejo == 2:
+                cleam()
                 print("""
         |=======================================|
         | você continuo explorando a floresta   |
         | e algumas horas depois encontrou      |
         | outra masmorra                        |
-        |=======================================|""")           
+        |=======================================|""") 
             else:
                 print(erro)
 
 def explorar_masmorra(): #entrou na masmorra ou ja estava e desejou continuar
-    seleção()
     global desejo
-    if desejo == 1:
-        explorar_floresta()
 
-    elif desejo == 2:
-        roleta_russa()
+    while True:
+        seleção()
+
+        if desejo == 1:
+            return
+
+        elif desejo == 2:
+            roleta_russa()
 
 def seleção(): # oque você quer fazer dentro da masmorra
     global desejo
-    while desejo !=2 or desejo !=1:
+    desejo = 0
+    while desejo not in (1, 2):
+        cleam()
         desejo = int(input("""
         |=======================================|
         | oque deseja fazer ?                   |
@@ -62,18 +77,21 @@ def seleção(): # oque você quer fazer dentro da masmorra
 
 def roleta_russa():
     global loteria
+    global desejo
     loteria = random.choice([1, 2, 3])
-    global vida_jogador
+    global jogador
     if loteria == 1: #nada
         print("""
         |=======================================|
         | você explorou e não achou nada        |
         |=======================================|""")
-        explorar_masmorra()       
+        desejo = 0
+        return   
         
 
     elif loteria == 2: #bau
-        while desejo !=2 or desejo !=1:
+        desejo = 0 
+        while desejo not in (1, 2):
             desejo = int(input("""
         |======================================|
         | você explorou mais fundo e achau um  |
@@ -93,9 +111,12 @@ def roleta_russa():
         | não tinha nada no bau, oque você     |
         | ira fazer agora?                     |
         |======================================|""")
-                explorar_masmorra()
+                time.sleep(1.5)
+                return
+                
             elif loteria == 2: # poção
-                while desejo !=2 or desejo !=1:
+                desejo = 0
+                while desejo not in (1, 2):
                     desejo = int(input("""
         |======================================|
         | dentro havia uma poção suspeita      |
@@ -105,7 +126,8 @@ def roleta_russa():
         | 2 - jogar fora                       |
         |======================================|
          >>>"""))
-                if desejo == 1:
+
+                if desejo == 1: # beber
                     loteria = random.choice([1, 2, 3])
                     if loteria == 1: # nada
                         print("""
@@ -113,7 +135,8 @@ def roleta_russa():
         | ela não possuia nenhum efeito        |
         | provavelmte era so agua suja         |
         |======================================|""")
-                        explorar_masmorra()
+                        cleam()
+                        return
 
                     elif loteria == 2: # cura
                         print("""
@@ -124,14 +147,17 @@ def roleta_russa():
         | algum curandeira que ja esteve nesta |
         | masmorra anteriormente               |
         |======================================|""")
-                        vida_jogador += 20
+                        cleam()
+                        jogador["vida"] += 20
+
                         print(f"""
         |======================================|
         | adicional de vida de: +20            |
         |======================================|
-        | vida total: {vida_jogador:<25}        |
+        | vida total: {jogador["vida"]:<25}        |
         |======================================|""")
-                        explorar_masmorra()
+                        cleam()
+                        return
 
                     elif loteria == 3: # azarado do caralho pegou o bagulho envenenado
                         print("""
@@ -140,14 +166,18 @@ def roleta_russa():
         | saindo do seu corpo, ela provavel-   |
         | mente era uma poção envenenada       |
         |======================================|""")
-                        vida_jogador -= 20
+                        cleam()
+                        jogador["vida"] -= 20
                         print(f"""
         |======================================| 
         | vida perdida de: -20                 |
         |======================================|
-        | vida total: {vida_jogador:<25}|
+        | vida total: {jogador["vida"]:<25}|
         |======================================|""")
-                        explorar_masmorra()
+                        cleam()
+                        return 
+                else:
+                    cleam()
 
                     
         elif desejo == 2: # ignorou o bau
@@ -156,40 +186,43 @@ def roleta_russa():
         | você descidiu ignorar o bau e        |
         | continuar explorando                 |
         |======================================| """)
-            explorar_masmorra()
+            cleam()
+            return
         else:
             print(erro)
         
     elif loteria == 3:#monstro escolha
         loteria = random.choice([1, 2, 3])
-        global vida_monstro
-        global monstro_tag
+        global monstro
         if loteria == 1: #slime
-            vida_monstro = 100
-            monstro_tag = "slime"
+            monstro["vida"] = 100
+            monstro["nome"] = "slime"
         elif loteria == 2: #zumbie
-            vida_monstro = 150
-            monstro_tag = "zumbie"
+            monstro["vida"] = 150
+            monstro["nome"] = "zumbie"
         elif loteria == 3: #dragão
-            vida_monstro = 300
-            monstro_tag = "dragão"
+            monstro["vida"] = 300
+            monstro["nome"] = "dragão"
         
-        while desejo !=2 or desejo !=1:
+        desejo = 0
+        while desejo not in (1, 2):
             desejo = int(input(f"""
         |======================================|
-        | você encontrou um {monstro_tag:<19}|
+        | você encontrou um {monstro["nome"]:<19}|
         | que açao desejo executar?            |
         |======================================|
         | 1 - entrar em combate                |
         | 2 - fugir                            | 
         |======================================|
          >>>"""))
+        cleam()
         if desejo == 1: # bora brigar
             print(f"""
         |======================================|    
         | você descidiu entrar em combate com  |
-        | {monstro_tag:<37}|
-        |======================================|""")    
+        | {monstro["nome"]:<37}|
+        |======================================|""")
+            cleam()    
             combate()
         
         elif desejo == 2: # cagão
@@ -198,25 +231,28 @@ def roleta_russa():
         | você fugiu do monstro, e agora que   |
         | ação ira executar?                   | 
         |======================================|""")
-            explorar_masmorra()
+            cleam()
+            return 
         else:
             print(erro)
 
 def combate():
-    global vida_jogador
-    global vida_monstro
+    global jogador
+    global monstro
     global dano
-    while vida_jogador > 0 and vida_monstro > 0:
+    global desejo
+    while jogador["vida"] > 0 and monstro["vida"] > 0:
 
         print(f"""
         |======================================|
-        | monstro: {monstro_tag:<28}|
-        | vida:{vida_monstro:<32}|
+        | monstro: {monstro["nome"]:<28}|
+        | vida:{monstro["vida"]:<32}|
         |======================================|
-        | sua vida: {vida_jogador:<27}|
+        | sua vida: {jogador["vida"]:<27}|
         |======================================|""")
 
-        while desejo !=2 or desejo !=1:
+        desejo = 0
+        while desejo not in (1, 2):
             desejo = int(input("""
         |======================================|
         | que ação você deseja executar ?      |
@@ -224,57 +260,62 @@ def combate():
         | 2 - fugir                            |
         |======================================| 
          >>>"""))
-        if desejo == 1: # atacar
-            print("""
+            cleam()
+            if desejo == 1: # atacar
+                print("""
         |======================================|
         | você descidiu atacar                 |
         |======================================|""")
-            loteria = random.choice([1, 2, 3])
-            if loteria == 1: # errou
-                dano = 0
+                loteria = random.choice([1, 2, 3])
+                if loteria == 1: # errou
+                    dano = 0
 
-            elif loteria == 2: # normal
-                dano = 10
+                elif loteria == 2: # normal
+                    dano = 10
 
-            elif loteria == 3: #critico
-                dano = 30
-            print(f"""
+                elif loteria == 3: #critico
+                    dano = 30
+                print(f"""
         |======================================|
         | você infrigiu {dano:<3} de dano            |
         |======================================|""")
-            vida_monstro -= dano
-            if vida_monstro <= 0:
-                print("""
+                time.sleep(1.5)
+                monstro["vida"] -= dano
+                if monstro["vida"] <= 0:
+                    print("""
         |======================================|
         | parabens você você derrotou o monstro|
         |======================================|""")
-                explorar_masmorra()
-            print(f"""
+                    time.sleep(1.5)
+                    cleam()
+                    return
+                cleam()
+                print(f"""
         |======================================|
-        | monstro: {monstro_tag:<28}|
-        | vida: {vida_monstro:<31}|
+        | monstro: {monstro["nome"]:<28}|
+        | vida: {monstro["vida"]:<31}|
         |======================================|
         | agora é o turno do monstro           |
         |======================================|""")
+                time.sleep(2)
+                loteria = random.choice([1, 2, 3])
+                if loteria == 1: #errou
+                    dano = 0
 
-            loteria = random.choice([1, 2, 3])
-            if loteria == 1: #errou
-                dano = 0
+                elif loteria == 2: #normal 
+                    dano = 10
 
-            elif loteria == 2: #normal 
-                dano = 10
-
-            elif loteria == 3: # critico
-                dano = 30
-            print(f"""
+                elif loteria == 3: # critico
+                    dano = 30
+                print(f"""
         |======================================|
         | ele causou {dano:<3} de dano em você       |
         |======================================|""")
-            vida_jogador -= dano
-            if vida_jogador <= 0:
-
-                while desejo != 1 or desejo != 2:
-                    desejo = int(input("""
+                jogador["vida"] -= dano
+                if jogador["vida"] <= 0:
+                    desejo = 0
+                    while desejo not in (1, 2):
+                        desejo = int(input("""
 
         |              GAME__OVER              |    
         |======================================|
@@ -287,28 +328,33 @@ def combate():
         | 2 - encerrar jornada                 |
         |======================================|
          >>>"""))
-                if desejo == 1:
-                    print("""
+                        cleam()
+                    if desejo == 1:
+                        print("""
         |======================================|
         | você iniciou uma nova jornada        |
         |======================================| """)
-                    inicio_de_jornada()
-                elif desejo == 2:
-                    print("""
+                        cleam()
+                        inicio_de_jornada()
+                    elif desejo == 2:
+                        print("""
         |======================================|
         |          obrigado por jogar          |
         |======================================|""")
-                    exit()
-        elif desejo == 2: #fugir
-            centralizado("""
+                        cleam()
+                        exit()
+            elif desejo == 2: #fugir
+                print("""
         |======================================|
         | você conseguio fugiu                 |
         |======================================|""")
-            seleção()
-        else:
-            print(erro)
+                cleam()
+                return
+            else:
+                print(erro)
 
 def inicio_de_jornada():
+    jogador["vida"] = 100
     print("""
         |======================================|
         | você estava explorando a floresta    |
@@ -323,6 +369,7 @@ while desejo not in (1, 2): # inicio, quando executa o programa
         | 2 - fechar programa                  |
         |======================================|
          >>>"""))
+    cleam()
     if desejo not in (1, 2):
         print(erro)
 if desejo == 1:
@@ -333,6 +380,8 @@ elif desejo == 2:
         | você escolheu fechar o jogo          |
         | espero que jogue novamente mais tarde|
         |======================================|""") 
+    time.sleep(1.5)
+    cleam()
     exit()       
 else:
     print(erro)
